@@ -1,23 +1,29 @@
-import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+
+import Chat from './Chatroom/Chat'
+import Landing from './Landing/Landing'
+
 
 function App() {
+  let history = useHistory();
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+        <p class="app-title">
+          chatable.io 💬
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+        <div class="app-body">
+        <Router>
+          <Switch>
+            <Route history={history} path='/chat' component={Chat}></Route>
+            <Route history={history}  path='/' component={Landing}></Route>
+        </Switch>
+       </Router>
+
+        </div>
+
+      
     </div>
   );
 }

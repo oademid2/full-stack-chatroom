@@ -1,5 +1,5 @@
 .App {
-  text-align: center;
+
 }
 
 .App-logo {
@@ -35,4 +35,21 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+
+.app-title{
+  text-align: center;
+  padding: 12px;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight:bold;
+  font-size: 20px;
+  border-bottom: 1px solid rgb(211, 210, 210);
+}
+
+.app-body{
+  background-color: #61dafb;
+
+  min-height:650px;
+  display: flex;
 }
