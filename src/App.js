@@ -7,8 +7,9 @@ import Landing from './Landing/Landing'
 import * as util from './util'
 
 
-function App() {
+function App(props) {
   let history = useHistory();
+  let data ={}
   
   return (
     <div className="App">
@@ -18,8 +19,8 @@ function App() {
         <div class="app-body">
 
           <Switch>
-            <Route  path='/chat' component={()=><ChatRoom util={util} history={history}  /> }></Route>
-            <Route  path='/' component={()=><Landing util={util} history={history}  />} ></Route>
+            <Route  path='/chat' component={()=><ChatRoom data={data} util={util} history={history}  /> }></Route>
+            <Route  path='/' component={()=><Landing data={data} util={util} history={history}  />} ></Route>
         </Switch>
 
 

@@ -11,8 +11,9 @@ ReactDOM.render(
   <React.StrictMode>
     <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-firestore.js"></script>
 
+
             <Router>
-    <App />
+    <App socket={null} />
     </Router>
   </React.StrictMode>,
   document.getElementById('root')

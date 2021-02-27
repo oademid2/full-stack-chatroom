@@ -71,7 +71,7 @@ class rooms  {
     static async getMessages(roomCode){
 
 
-        return messagesRef.doc(roomcode).orderBy('createdAt').get().then((doc) => {
+        return messagesRef.doc(roomCode).orderBy('createdAt').get().then((doc) => {
             if (doc.exists) {
                 console.log("Document data:", doc.data());
                 return doc.data()

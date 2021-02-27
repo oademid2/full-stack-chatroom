@@ -1,12 +1,8 @@
-import { BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom';
-import { useHistory } from "react-router-dom";
-import React, { useState,  useEffect} from 'react';
-import { withRouter } from "react-router";
-
-
 import './CreateRoom.css';
 import CustomInput from './CustomInput'
-import CustomButton from './CustomButton'
+import Room from './RoomModel'
+import React, { useState,  useEffect} from 'react';;
+
 
 
 function CreateRoom(props) {
@@ -17,7 +13,7 @@ function CreateRoom(props) {
     const [roomName, setRoomName] = useState("")
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
-    const [roomCode, setRoomCode] = useState("|")
+    const [roomCode, setRoomCode] = useState("")
 
 
 
@@ -26,10 +22,17 @@ function CreateRoom(props) {
 
     }
 
-    function createRoom(){
-      
-      props.util.rooms.createRoom(roomName, userName, password)
-      props.history.push("/chat")
+    function onCreateRoom(){
+
+
+      let room = new Room(roomCode, roomName, userName)
+      props.data.room = room;
+
+      /*localStorage.setItem("create-room", true)
+      localStorage.setItem("room-code", roomCode)
+      localStorage.setItem("room-name", roomName)
+
+      props.history.push("/chat?="+roomCode)*/
 
     }
   return (
@@ -65,7 +68,7 @@ function CreateRoom(props) {
 
 
 
-            <button onClick={createRoom} class="btn">
+            <button onClick={onCreateRoom} class="btn">
                 create
             </button>
 

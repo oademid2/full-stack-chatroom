@@ -20,12 +20,14 @@ p{
 
 .chatroom-view{
     background-color: white;
+    min-width: 100%;
 }
 
 .chatroom-messages-view{
     padding: 0 14px;
+
     min-height: 570px;
-    max-height: 570px;
+    max-height: 590px;
     overflow-y: scroll;
 }
 

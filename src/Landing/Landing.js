@@ -16,9 +16,9 @@ function Landing(props) {
       
       <Router>
           <Switch>
-          <Route path='/joinroom' component={()=> <JoinRoom history={props.history} />}></Route>
-          <Route path='/createroom' component={()=> <CreateRoom history={props.history}  {...props} />}></Route>
-          <Route path='/' component={()=> <LandingPrompt history={props.history} />}></Route>
+          <Route path='/joinroom' component={()=> <JoinRoom {...props} history={props.history} />}></Route>
+          <Route path='/createroom' component={()=> <CreateRoom  {...props} history={props.history}  {...props} />}></Route>
+          <Route path='/' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
         </Switch>
        </Router>
       
