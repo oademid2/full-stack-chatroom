@@ -19,6 +19,11 @@ function JoinRoom(props) {
         setter(event.target.value)
     }
 
+    function joinRoom(){
+
+      props.history.push("/chat?roomcode="+roomCode)
+    }
+
   return (
     <div class="root">
 
@@ -39,7 +44,7 @@ function JoinRoom(props) {
             />
 
           <CustomButton 
-            onClick={()=>props.history.push("/chat")}
+            onClick={joinRoom}
             text={"join"}
         
           />

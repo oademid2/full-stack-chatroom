@@ -4,11 +4,10 @@ import './ChatMessage.css';
 
 function ChatMessage(props) {
 
- let class_ ="chat-message-view " + props.isUser?"user":" ";
   return (
    
-    <div className={"chat-message-view user "}>
-        <p className={"chat-message-text user "}>
+    <div className={"chat-message-view "+ (props.isUser?"user":" ")}>
+        <p className={"chat-message-text "+ (props.isUser?"user":" ")}>
             {props.text}
         </p>
         <p class="username-text">{props.userName}</p>

@@ -12,17 +12,26 @@ import CustomButton from './CustomButton'
 function CreateRoom(props) {
 
 
-    let history = useHistory();
+
 
     const [roomName, setRoomName] = useState("")
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
     const [roomCode, setRoomCode] = useState("|")
 
+
+
     function setValue(setter, event){
         setter(event.target.value)
+
     }
 
+    function createRoom(){
+      
+      props.util.rooms.createRoom(roomName, userName, password)
+      props.history.push("/chat")
+
+    }
   return (
     <div class="root">
 
@@ -56,7 +65,7 @@ function CreateRoom(props) {
 
 
 
-            <button onClick={()=> props.history.push("/chat")} class="btn">
+            <button onClick={createRoom} class="btn">
                 create
             </button>
 

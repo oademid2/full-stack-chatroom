@@ -9,6 +9,7 @@ import JoinRoom from './JoinRoom'
 
 
 function Landing(props) {
+  console.log(props)
 
   return (
     <div class="root">
@@ -16,7 +17,7 @@ function Landing(props) {
       <Router>
           <Switch>
           <Route path='/joinroom' component={()=> <JoinRoom history={props.history} />}></Route>
-          <Route path='/createroom' component={()=> <CreateRoom history={props.history} />}></Route>
+          <Route path='/createroom' component={()=> <CreateRoom history={props.history}  {...props} />}></Route>
           <Route path='/' component={()=> <LandingPrompt history={props.history} />}></Route>
         </Switch>
        </Router>

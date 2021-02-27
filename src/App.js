@@ -1,25 +1,27 @@
 import './App.css';
-import { BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom';
-import { useHistory } from "react-router-dom";
+import { useHistory, BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom';
 
-import Chat from './Chatroom/Chat'
+import ChatRoom from './Chatroom/ChatRoom'
 import Landing from './Landing/Landing'
+
+import * as util from './util'
 
 
 function App() {
   let history = useHistory();
+  
   return (
     <div className="App">
         <p class="app-title">
           chatable.io 💬
         </p>
         <div class="app-body">
-        <Router>
+
           <Switch>
-            <Route history={history} path='/chat' component={Chat}></Route>
-            <Route history={history}  path='/' component={Landing}></Route>
+            <Route  path='/chat' component={()=><ChatRoom util={util} history={history}  /> }></Route>
+            <Route  path='/' component={()=><Landing util={util} history={history}  />} ></Route>
         </Switch>
-       </Router>
+
 
         </div>
 
