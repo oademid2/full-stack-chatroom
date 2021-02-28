@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom";
 import { withRouter } from "react-router";
 
 
-import styleSheet from './StyleSheet'
+import styleSheet from '../Styles/StyleSheet'
 
 import './Landing.css';
 
@@ -16,18 +16,26 @@ function LandingPrompt(props) {
   
   }
 
+  function removeToken(){
+    localStorage.removeItem("persistentToken")
+  }
+
   return (
     <div class="root">
 
       <div class="login-options-view">
-        <button  style={{...styleSheet.blockButton}}  onClick= {()=> {
-          props.history.push("/createroom")
-          console.log('test')
-          
-        }} > 
+        <button  
+          style={{...styleSheet.largeButton}}  
+          onClick= {()=> {props.history.push("/createroom")}} 
+        > 
           Create Room
         </button>
-        <button onClick= {()=> props.history.push("/joinroom")}  style={{...styleSheet.blockButton}}  >Join Room</button>
+        <button 
+          onClick= {()=> props.history.push("/joinroom")}  
+          style={{...styleSheet.largeButton}}>
+            Join Room
+        </button>
+        <button onClick= {()=> removeToken()}>remove token</button>
       </div>
     </div>
 

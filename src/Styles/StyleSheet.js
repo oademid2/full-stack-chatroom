@@ -11,7 +11,7 @@ const styleDef = {
             width:"200px"
     },
 
-    blockButton:{
+    largeButton:{
         fontSize: "24px",
         backgroundColor: "rgb(0, 174, 255)",
         color: "white",

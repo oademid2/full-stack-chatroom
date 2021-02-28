@@ -1,8 +1,10 @@
 export default class Message{
 
-    constructor(user_name, message, ) { 
-        this.user_name = user_name;
+    constructor(message, userName, id, tkn) { 
         this.message = message;
+        this.userName = userName;
+        this.id = id;
+        this.userToken = tkn;
     }
 
 }

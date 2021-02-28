@@ -9,7 +9,12 @@ import * as util from './util'
 
 function App(props) {
   let history = useHistory();
-  let data ={}
+  let data ={
+    user: null,
+    room:null,
+    persistentToken: localStorage.getItem("persistentToken")
+  }
+
   
   return (
     <div className="App">

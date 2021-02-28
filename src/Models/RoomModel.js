@@ -5,5 +5,4 @@ export default class Room{
         this.roomName = roomName;
         this.admin = admin;
     }
-
 }

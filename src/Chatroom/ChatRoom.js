@@ -7,150 +7,237 @@ import io from 'socket.io-client';
 
 
 import ChatMessage from './ChatMessage';
-
-let mesages = [];
-
-function Chat(props) {
-
-    const [room, setRoom] = useState(true)
-    const [user, setUser] = useState(true)
-    const [newMessage, setNewMessage] = useState("")
-    //const [messages, setMessages] = useState([])
-
-    const [isAdmin, setIsAdmin] = useState(false)
-
-    const [roomSocket, setRoomSocket] = useState(null)
-    //const socket = props.socket;
-    
-
-    useEffect(() => {
-
-        let room_ = new Room("25", "love isalnd ❤️", "kit")//props.data.room
-        let user_ = {userName:"kit"} //props.data.user_
-        let isAdmin_ = room_.admin == user.userName? true: false;
-
-        setRoom(room_)
-        setUser(user_)
-        setIsAdmin(isAdmin_)
-
-        //TODO: enter by url
-        //let roomCode_ = query_params(window.location.href)
-
-        const socket = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
-
-        /*
-        //url info
-        //set states
-        if(isAdmin_)setIsAdmin(true)
-        setRoomCode(roomCode_)
-        */
-
-
-        //socket functions
-        socket.on('connect', (connection) => {
-
-            console.log(isAdmin_)
-            setRoomSocket(socket)
-            
-            if(isAdmin_)socket.emit('create-room', room_.roomCode)
-            else socket.emit('join-room', room_.roomCode)
+import SocketManager from './Socket'
 
 
 
-            socket.on('backlog-messages', (messages_) => {
-                //setMessages(messages_)
-                messages = messages_;
+// "bnh5yzdirjinqaorq0ox1tf383nb3xr"
 
-            });
-
-            socket.on('broadcasted-message', (message) => {
-
-                console.log("received: ",message)
-                console.log(messages)
-                let msg = [...messages]
-                msg.push(message)
-                console.log(msg)
-                setMessages([...msg])
-
-            });
-
-      });
-
-        
-    }, []);
+class Chat extends React.Component{
 
 
-    function setValue(setter, event){
-        setter(event.target.value)
+    constructor(props){
 
-    }
+        super(props)
 
-    function sendMessage(){
-        roomSocket.emit("broadcast-message", room.roomCode, newMessage, user.userName)
-        setNewMessage("")
-    }
-    
+        this.socket = null; 
 
 
+        console.log(props.data.room)
+        if(!props.data.room) props.history.push("/joinroom")
 
-    function query_params(queryString){
-        
-        var queryParts = queryString.split('?')
-        var pairsString;
-        var query = {}
+        let room_ = props.data.room//new Room("25", "love isalnd ❤️", "kit")//props.data.room
+        let user_ = props.data.user//{userName: props.data.user.userName} //props.data.user_
+        let isAdmin_ = room_ ?  (room_.admin == user_.userName? true: false):null
+        let token_= props.data.persistentToken? props.data.persistentToken: null;
+        console.log("token is: ", token_)
 
-        console.log(queryParts)
-        if(queryParts.length > 1) pairsString = queryParts[1].split('=');
-        console.log(pairsString)
+        this.removeMessage =this.removeMessage.bind(this)
 
-        let i=0;
-        while(i <pairsString.length){
-            query[pairsString[i]] = pairsString[i+1]
-            i+=2;
+        this.state ={
+            room: room_,
+            user: user_,
+            isAdmin: isAdmin_,
+            newMessage: "",
+            messages: [],
+            status: "loading"
         }
-        console.log(query)
 
-        return query
+        if(!this.state.room)this.props.history.push("/joinroom")
+        
     }
 
     
+    componentDidMount(){
+        if(!this.state.room)this.props.history.push("/joinroom")
+        else{
+            this.connectSocket()
+            this.socketEvents()
+        }
+    }
 
+    connectSocket(){
+        this.socket = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
+    }
+
+
+    set(field, value){
+        this.setState({[field]: value})
+    }
+
+    socketEvents(){
+
+        
+        //socket functions
+        this.socket.on('connect', (connection) => {
+           
+            if(this.state.isAdmin){
+                this.socket.emit('create-room', SocketManager.createRoom(this))
+            }else{
+                this.socket.emit('join-room', this.state.room.roomCode,  this.props.data.persistentToken)
+            }
+            console.log("connected.")
+
+            this.socket.on('generated-user-token', (tkn) => {
+                console.log("generated token: ",tkn)
+                this.props.data.persistentToken = tkn;
+                localStorage.setItem("persistentToken", tkn)
+            });
+
+
+            this.socket.on('backlog-messages', (messages_) => {
+                this.set("messages",messages_ )
+                console.log("messages received: ", messages_)
+            });
+
+            this.socket.on('broadcasted-message', (message) => {
+                console.log("received: ",message)
+                console.log([...this.state.messages,message])
+                this.set("messages", [...this.state.messages,message])
+                this.set("pending", "loaded")
+            });
+
+            this.socket.on('room-ended', () => {
+                console.log("room ended. ")
+                this.socket.close()
+                this.detachFromRoom()
+            });
+
+            this.socket.on('removed-message', (messages_) => {
+                this.set("messages",messages_ )
+                console.log("messages updated: ", messages_)
+            });
+
+            this.socket.on('find-and-ban-user', (token) => {
+                console.log("user has been banned.")
+                console.log(token == this.props.data.persistentToken)
+                if(token == this.props.data.persistentToken){
+                    this.detachFromRoom();
+                    this.set("status","banned" )
+
+                }
+            });
+
+        });
+
+   
+
+
+
+    }
+
+    setValue(setter, event){
+        this.set(setter, event.target.value)
+    }
+
+    updateNewMessage(event){
+        this.set("newMessage" ,event.target.value)
+    }
+
+    sendMessage(){
+        this.socket.emit("broadcast-message", this.state.room.roomCode, this.state.newMessage, this.state.user.userName, this.props.data.persistentToken)
+        this.set("newMessage", "")
+    }
+
+    endRoom(){
+        this.socket.emit("end-room", this.state.room.roomCode)
+        this.detachFromRoom()
+    }
+
+    detachFromRoom(){
+        this.set("room",null)
+        this.socket.close()
+        this.socket = null;
+        this.set("status", "closed")
+    }
+
+    leaveRoom(){
+        this.socket.emit("leave-room", this.roomCode)
+        this.detachFromRoom();
+        this.props.history.push("/")
+    }
+
+    removeUser(msg){
+       
+        
+    }
+    
+    exitClosedRoom(){
+        this.props.history.push("/")
+    }
+
+    removeMessage(msg){
+        alert("user will be banned")
+        console.log(msg,  this.state.room.roomCode, msg)
+        this.socket.emit("ban-user", this.state.room.roomCode, msg)
+    }
 
 
 
   
+    render(){
 
-  return (
-    <div class="root">
-    {room?
+        return (
+            <div class="root">
+            {this.state.room && this.state.status != "closed" ?
+                <div class="chatroom-view">
+                
+                <div class="title-view">
+     
+                    <p class="title-text">{this.state.room.roomName}</p>
+                    {this.state.isAdmin?
+                        <p class="title-leave-btn"  onClick={this.endRoom.bind(this)}>end room</p>:
+                        <p class="title-leave-btn"  onClick={this.leaveRoom.bind(this)}>leave</p>
+                    }
 
-        <div class="chatroom-view">
-        <div class="title-view">
-            <p class="title-text">{room.roomName}</p>
-        </div>
-        <div class="chatroom-messages-view">
-    
-            {messages?
-            <div>
-                {messages.map(msg=> <ChatMessage key={msg.id} text={msg.message} userName={""} isUser={false}/>)}
+        
+                </div>
+              
+                <div class="chatroom-messages-view">
+            
+                    {this.state.messages?
+                    <div>
+                        {this.state.messages.map(msg=> 
+                        <ChatMessage 
+                            onClick={()=> this.removeMessage(msg)} 
+                            key={msg.id} text={msg.message} 
+                            userName={msg.userName } 
+                            isUser={this.state.user.userName == msg.userName}/>)}
+                    </div>
+                        :null
+                    }
+        
+                    </div>
+
+                    <div class="typed-message-view">
+                        <input  type="text" value={this.state.newMessage} onChange={(event)=> this.setValue("newMessage", event) }class="typed-message-input"></input>
+                        <i class="material-icons send-message-btn" onClick={this.sendMessage.bind(this)}>&#xe163;</i>
+                    </div>
+        
                 </div>
                 :null
             }
 
+            {this.state.status == "closed"?
+            <div>
+                <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
+                <p> room is closed.</p>
+            </div>:
+                null
+            }
+
+            {this.state.status == "banned"?
+            <div>
+                <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
+                <p> you've been removed.</p>
+            </div>:
+                null
+            }
             </div>
-            <div class="typed-message-view">
-            
-                <input  type="text" value={newMessage} onChange={(event)=> setValue(setNewMessage, event) }class="typed-message-input"></input>
-                <i class="material-icons send-message-btn" onClick={sendMessage}>&#xe163;</i>
-
-
-            </div>
-
-        </div>
-        :null
+        );
+        
     }
-    </div>
-  );
+    
 }
 
 export default Chat;
