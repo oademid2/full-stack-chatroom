@@ -50,7 +50,7 @@ function CreateRoom(props) {
     function onCreateRoom(){
 
       //Create room object //create user object
-      let room = new Room(roomCode, roomName, userName)
+      let room = new Room("26", roomName, userName)
       let user = {userName: userName}
       //update props
       props.data.user = user

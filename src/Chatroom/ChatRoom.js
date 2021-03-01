@@ -23,8 +23,6 @@ class Chat extends React.Component{
 
         this.socket = null; 
 
-
-        console.log(props.data.room)
         if(!props.data.room) props.history.push("/")
 
         let room_ = props.data.room//new Room("25", "love isalnd ❤️", "kit")//props.data.room
@@ -82,6 +80,7 @@ class Chat extends React.Component{
             this.socket.on('generated-user-token', (tkn) => {
                 this.props.data.persistentToken = tkn;
                 localStorage.setItem("persistentToken", tkn)
+                console.log("new token generated: ",tkn)
             });
 
 
@@ -108,6 +107,9 @@ class Chat extends React.Component{
             this.socket.on('find-and-ban-user', (token) => {
                 console.log("user has been banned.")
                 console.log(token === this.props.data.persistentToken)
+                console.log(token, this.props.data.persistentToken)
+
+                
                 if(token === this.props.data.persistentToken){
                     this.detachFromRoom();
                     this.set("status","banned" )

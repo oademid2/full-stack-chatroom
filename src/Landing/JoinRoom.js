@@ -44,21 +44,25 @@ function JoinRoom(props) {
         socket.emit('find-room', roomCode)
 
         //if room does not exist
+        socket.on('user-is-banned', () => {
+          console.log('user-is-banned')
+          //TODO: alert
+          return
+        })
+
         socket.on('room-not-found', () => {
           //TODO: alert
           return
         })
 
+
         //if room exists
         socket.on('room-found', (room) => {
-
-          console.log("ya")
           props.data.user = {userName: userName};
           props.data.room = room;
-          //props.history.push("/chat?code="+roomCode)
-          props.pushHistory("/chat?code="+roomCode)
-  
-          
+          props.history.push("/chat?code="+roomCode)
+          //props.pushHistory("/chat?code="+roomCode)
+
         })
 
       })
@@ -108,4 +112,4 @@ function JoinRoom(props) {
   );
 }
 
-export default withRouter(JoinRoom);
+export default JoinRoom;

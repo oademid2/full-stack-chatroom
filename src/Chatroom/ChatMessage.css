@@ -1,21 +1,28 @@
 .chat-message-view{
     margin-top:20px;
     margin-bottom: 20px;
+    padding: 0px 20px;
+    min-width: 100%;
+    max-width: 100%;
+    position: relative;
 
 }
 
 .chat-message-view.user{ 
-    text-align: right;
+    text-align: left;
 }
 
 .chat-message-text{
     background-color: rgb(124, 210, 250);
-    border-radius: 18px;
+    border-radius: 12px;
     display: inline-block;
     width: auto;
     font-family: Helvetica, Arial, sans-serif;
-    max-width: 60%;
-    padding: 16px;
+
+    min-width: 100%;
+    max-width: 100%;
+    padding: 10px 14px;
+    margin:0px;
 
 }
 
@@ -24,5 +31,15 @@
 }
 
 .username-text{
-    padding: 7px 0px;
+    padding: 2px 0px;
+    margin:0px;
+    font-size:12px;
+}
+
+.message-options-view{
+    background-color: aqua;
+    min-width: 100px;
+    position: absolute;
+    bottom: -10px;
+    right:20px;
 }

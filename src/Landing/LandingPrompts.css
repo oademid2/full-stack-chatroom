@@ -1,6 +1,6 @@
 
 .root{
-    position: relative;
+
 }
 .landing-header{
 
@@ -20,6 +20,10 @@
 }
 
 
+.login-options-view{
+    min-width: 100%;
+    text-align: center;
+}
 
 .login-option-btn{
     font-size: 18px;
@@ -36,7 +40,12 @@
     font-size: 20px;
 }
 
+.button-join-room{
+
+    margin-bottom: 40px;
+}
 .button-create-room{
 
-    margin-top: 0px;
+    display: block;
+    margin-top: 40px;
 }
