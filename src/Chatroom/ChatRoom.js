@@ -1,8 +1,9 @@
 import './chatroom.css';
-import Room from './RoomModel'
-import Message from './MessageModel'
+//import Room from './RoomModel'
+//import Message from './MessageModel'
+import { withRouter} from 'react-router-dom';
 
-import React, { useState,  useEffect} from 'react';
+import React from 'react';
 import io from 'socket.io-client';
 
 
@@ -24,11 +25,11 @@ class Chat extends React.Component{
 
 
         console.log(props.data.room)
-        if(!props.data.room) props.history.push("/joinroom")
+        if(!props.data.room) props.history.push("/")
 
         let room_ = props.data.room//new Room("25", "love isalnd ❤️", "kit")//props.data.room
         let user_ = props.data.user//{userName: props.data.user.userName} //props.data.user_
-        let isAdmin_ = room_ ?  (room_.admin == user_.userName? true: false):null
+        let isAdmin_ = room_ ?  (room_.admin === user_.userName? true: false):null //==
         let token_= props.data.persistentToken? props.data.persistentToken: null;
         console.log("token is: ", token_)
 
@@ -43,13 +44,13 @@ class Chat extends React.Component{
             status: "loading"
         }
 
-        if(!this.state.room)this.props.history.push("/joinroom")
+        if(!this.state.room)this.props.history.push("/")
         
     }
 
     
     componentDidMount(){
-        if(!this.state.room)this.props.history.push("/joinroom")
+        if(!this.state.room)this.props.history.push("/")
         else{
             this.connectSocket()
             this.socketEvents()
@@ -72,14 +73,13 @@ class Chat extends React.Component{
         this.socket.on('connect', (connection) => {
            
             if(this.state.isAdmin){
-                this.socket.emit('create-room', SocketManager.createRoom(this))
+                SocketManager.createRoom(this)
             }else{
                 this.socket.emit('join-room', this.state.room.roomCode,  this.props.data.persistentToken)
             }
             console.log("connected.")
 
             this.socket.on('generated-user-token', (tkn) => {
-                console.log("generated token: ",tkn)
                 this.props.data.persistentToken = tkn;
                 localStorage.setItem("persistentToken", tkn)
             });
@@ -87,12 +87,9 @@ class Chat extends React.Component{
 
             this.socket.on('backlog-messages', (messages_) => {
                 this.set("messages",messages_ )
-                console.log("messages received: ", messages_)
             });
 
             this.socket.on('broadcasted-message', (message) => {
-                console.log("received: ",message)
-                console.log([...this.state.messages,message])
                 this.set("messages", [...this.state.messages,message])
                 this.set("pending", "loaded")
             });
@@ -110,8 +107,8 @@ class Chat extends React.Component{
 
             this.socket.on('find-and-ban-user', (token) => {
                 console.log("user has been banned.")
-                console.log(token == this.props.data.persistentToken)
-                if(token == this.props.data.persistentToken){
+                console.log(token === this.props.data.persistentToken)
+                if(token === this.props.data.persistentToken){
                     this.detachFromRoom();
                     this.set("status","banned" )
 
@@ -179,7 +176,7 @@ class Chat extends React.Component{
 
         return (
             <div class="root">
-            {this.state.room && this.state.status != "closed" ?
+            {this.state.room && this.state.status !== "closed" ?
                 <div class="chatroom-view">
                 
                 <div class="title-view">
@@ -202,7 +199,7 @@ class Chat extends React.Component{
                             onClick={()=> this.removeMessage(msg)} 
                             key={msg.id} text={msg.message} 
                             userName={msg.userName } 
-                            isUser={this.state.user.userName == msg.userName}/>)}
+                            isUser={this.state.user.userName === msg.userName}/>)}
                     </div>
                         :null
                     }
@@ -218,7 +215,7 @@ class Chat extends React.Component{
                 :null
             }
 
-            {this.state.status == "closed"?
+            {this.state.status === "closed"?
             <div>
                 <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
                 <p> room is closed.</p>
@@ -226,7 +223,7 @@ class Chat extends React.Component{
                 null
             }
 
-            {this.state.status == "banned"?
+            {this.state.status === "banned"?
             <div>
                 <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
                 <p> you've been removed.</p>
@@ -240,48 +237,4 @@ class Chat extends React.Component{
     
 }
 
-export default Chat;
-
-
-
-/*
-
-
-      //let roomCode_ = localStorage.getItem("room-code")
-        let isAdmin_ = localStorage.getItem('create-room')
-        let roomName_ = localStorage.getItem("room-name")
-        let userName_ = localStorage.getItem("user-name")
-        let room_ = {
-            name:roomName_,
-            admin: userName_,
-            password:"xxx",
-            code: roomCode_
-        }
-
-
-                <ChatMessage
-                text={"Hi, Sweet! So, what do you wanna do today?Sweet! "}
-                userName="name"
-                isUser={true}
-            ></ChatMessage>
-            <ChatMessage
-                text={"Hi, Sweet! So, what do you wanna do today?Sweet! "}
-                userName="name"
-                isUser={false}
-            ></ChatMessage>
-                    <ChatMessage
-                text={"Hi, Sweet! So, what do you wanna do today?Sweet! "}
-                userName="name"
-                isUser={true}
-            ></ChatMessage>
-            <ChatMessage
-                text={"Hi, Sweet! So, what do you wanna do today?Sweet! "}
-                userName="name"
-                isUser={false}
-            ></ChatMessage>
-                                <ChatMessage
-                text={"Hi, Sweet! So, what do you wanna do today?Sweet! "}
-                userName="name"
-                isUser={true}
-            ></ChatMessage>
-*/
+export default withRouter(Chat);

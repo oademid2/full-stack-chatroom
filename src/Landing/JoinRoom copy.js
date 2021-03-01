@@ -1,10 +1,7 @@
 import React, { useState,  useEffect} from 'react';
-import { Modal, Button } from 'antd';
-import { withRouter} from 'react-router-dom';
-
 
 import styleSheet from '../Styles/StyleSheet'
-import './JoinRoom.css';
+import './CreateRoom.css';
 import '../Styles/root-themes.css';
 
 import CustomInput from './CustomInput'
@@ -18,24 +15,16 @@ function JoinRoom(props) {
 
     const [roomCode, setRoomCode] = useState("")
     const [userName, setUserName] = useState("")
-    const [preRoomModalVisible, setPreRoomModalVisible] = useState(false);
-
 
     function setValue(setter, event){
         setter(event.target.value)
         console.log(roomCode)
     }
 
-    const showPreRoomModal = () => {
-      setPreRoomModalVisible(true);
-    };
 
-
-
-    function onJoinRoom(){
+    function joinRoom(){
 
      
-      console.log(props.history)
       let socket = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
 
       socket.on('connect', (connection) => {
@@ -52,12 +41,9 @@ function JoinRoom(props) {
         //if room exists
         socket.on('room-found', (room) => {
 
-          console.log("ya")
           props.data.user = {userName: userName};
           props.data.room = room;
-          //props.history.push("/chat?code="+roomCode)
-          props.pushHistory("/chat?code="+roomCode)
-  
+          props.history.push("/chat?code="+roomCode)
           
         })
 
@@ -66,14 +52,10 @@ function JoinRoom(props) {
     }
 
   return (
-    <div >
+    <div class="root">
 
 
-      <div class="join-room-view">
-
-        <h1 className="">Join A Room.</h1>
-
-
+      <div class="create-room-view">
 
             <CustomInput
                 title="Enter room code."
@@ -88,24 +70,17 @@ function JoinRoom(props) {
                 value={userName}
             />
 
-            
 
-
-
-      <button class="root-theme-button-sm join-room-button" onClick={()=>onJoinRoom()}>
+        <button class="root-theme-button-sm" onClick={()=>joinRoom()}>
                 join
         </button>
 
 
-
-
       </div>
-
-
       
     </div>
 
   );
 }
 
-export default withRouter(JoinRoom);
+export default JoinRoom;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, { useState} from 'react';
 import { withRouter } from "react-router";
 import "antd/dist/antd.css";
 
@@ -14,11 +14,7 @@ import './LandingPrompts.css';
 
 function LandingPrompt(props) {
 
-
-
   const [createAccountDrawerVisible, setCreateAccountDrawerVisible] = useState(false);
-  
-
 
   const onCreateAccount = () => {
     console.log("clicked")
@@ -50,7 +46,7 @@ function LandingPrompt(props) {
       
 
           <div class="login-options-view">
-          <JoinRoom {...props}  pushHistory={pushHistory} history={props.history}></JoinRoom>
+          <JoinRoom {...props}  history={props.history}></JoinRoom>
           <h4 className="title-create-room">Create a room instead?</h4>
             <button  
               className="root-theme-button-sm button-create-room"

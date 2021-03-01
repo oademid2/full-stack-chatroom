@@ -50,12 +50,14 @@ function CreateRoom(props) {
     function onCreateRoom(){
 
       //Create room object //create user object
-      let room = new Room(25, roomName, userName)
+      let room = new Room(roomCode, roomName, userName)
       let user = {userName: userName}
       //update props
       props.data.user = user
       props.data.room = room;
+      
       //change pages
+      console.log(props.data.room)
       props.history.push("/chat?="+roomCode)
 
 

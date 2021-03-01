@@ -1,5 +1,5 @@
 import './App.css';
-import { useHistory, BrowserRouter as Router, Route, Switch, Link} from 'react-router-dom';
+import { useHistory, BrowserRouter as Router, Route, Switch, Link, withRouter} from 'react-router-dom';
 
 import ChatRoom from './Chatroom/ChatRoom'
 import Landing from './Landing/Landing'

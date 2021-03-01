@@ -1,7 +1,7 @@
 
 const styleDef = {
 
-    smallbutton:{
+    smallButton:{
             fontSize: "18px",
             backgroundColor: "rgb(0, 174, 255)",
             color: "white",
