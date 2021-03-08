@@ -1,14 +1,21 @@
 import './chatroom.css';
-//import Room from './RoomModel'
-//import Message from './MessageModel'
 import { withRouter} from 'react-router-dom';
 
 import React from 'react';
 import io from 'socket.io-client';
+import autosize from "autosize";
+
 
 
 import ChatMessage from './ChatMessage';
 import SocketManager from './Socket'
+
+import { FaTelegramPlane } from "react-icons/fa";
+import { Modal, Button } from 'antd';
+
+
+
+
 
 
 
@@ -22,6 +29,8 @@ class Chat extends React.Component{
         super(props)
 
         this.socket = null; 
+        this.MaxMessageLength = 140;
+
 
         if(!props.data.room) props.history.push("/")
 
@@ -32,6 +41,8 @@ class Chat extends React.Component{
         console.log("token is: ", token_)
 
         this.removeMessage =this.removeMessage.bind(this)
+        this.onAddReaction = this.onAddReaction.bind(this)
+        this.showMessageOptions = this.showMessageOptions.bind(this)
 
         this.state ={
             room: room_,
@@ -39,7 +50,8 @@ class Chat extends React.Component{
             isAdmin: isAdmin_,
             newMessage: "",
             messages: [],
-            status: "loading"
+            status: "loading",
+            messageOptionsIsVisible: false
         }
 
         if(!this.state.room)this.props.history.push("/")
@@ -53,6 +65,8 @@ class Chat extends React.Component{
             this.connectSocket()
             this.socketEvents()
         }
+        this.textarea.focus();
+        autosize(this.textarea);
     }
 
     connectSocket(){
@@ -61,6 +75,8 @@ class Chat extends React.Component{
 
 
     set(field, value){
+        if(field == "newMessage") 
+            if(value.length >140)return
         this.setState({[field]: value})
     }
 
@@ -86,11 +102,12 @@ class Chat extends React.Component{
 
             this.socket.on('backlog-messages', (messages_) => {
                 this.set("messages",messages_ )
+                this.set("status", "loaded")
+
             });
 
             this.socket.on('broadcasted-message', (message) => {
                 this.set("messages", [...this.state.messages,message])
-                this.set("pending", "loaded")
             });
 
             this.socket.on('room-ended', () => {
@@ -100,6 +117,11 @@ class Chat extends React.Component{
             });
 
             this.socket.on('removed-message', (messages_) => {
+                this.set("messages",messages_ )
+                console.log("messages updated: ", messages_)
+            });
+
+            this.socket.on('update-message', (messages_) => {
                 this.set("messages",messages_ )
                 console.log("messages updated: ", messages_)
             });
@@ -171,23 +193,36 @@ class Chat extends React.Component{
         this.socket.emit("ban-user", this.state.room.roomCode, msg)
     }
 
+    onAddReaction(emoji, msg){
+        this.socket.emit("add-reaction", this.state.room.roomCode, msg, emoji)
+    }
 
+    closeMessageOptions(){
+        this.setState({messageOptionsIsVisible: false})
+    }
+
+
+    showMessageOptions(msg){
+        console.log(msg)
+        this.setState({messageOptionsIsVisible: true})
+    }
 
   
     render(){
 
         return (
-            <div class="root">
+            <div class="root-2">
             {this.state.room && this.state.status !== "closed" ?
                 <div class="chatroom-view">
                 
                 <div class="title-view">
      
-                    <p class="title-text">{this.state.room.roomName}</p>
-                    {this.state.isAdmin?
+                    <span class="title-text">{this.state.room.roomName}</span>
+                    {/*this.state.isAdmin?
                         <p class="title-leave-btn"  onClick={this.endRoom.bind(this)}>end room</p>:
                         <p class="title-leave-btn"  onClick={this.leaveRoom.bind(this)}>leave</p>
-                    }
+                    */ }
+                    <span class="leave-text">leave</span>
 
         
                 </div>
@@ -198,9 +233,14 @@ class Chat extends React.Component{
                     <div>
                         {this.state.messages.map(msg=> 
                         <ChatMessage 
-                            onClick={()=> this.removeMessage(msg)} 
-                            key={msg.id} text={msg.message} 
+                            onClick={()=> this.showMessageOptions(msg)} 
+                            onReportMessage={this.removeMessage}
+                            message ={msg}
+                            key={msg.id} 
+                            text={msg.message} 
                             userName={msg.userName } 
+                            reactions = {msg.reactions}
+                            onAddReaction={(emoji=>this.onAddReaction(emoji, msg))}
                             isUser={this.state.user.userName === msg.userName}/>)}
                     </div>
                         :null
@@ -209,8 +249,21 @@ class Chat extends React.Component{
                     </div>
 
                     <div class="typed-message-view">
-                        <input  type="text" value={this.state.newMessage} onChange={(event)=> this.setValue("newMessage", event) }class="typed-message-input"></input>
-                        <i class="material-icons send-message-btn" onClick={this.sendMessage.bind(this)}>&#xe163;</i>
+                    <textarea
+                        class="typed-message-input"
+                        ref={c => (this.textarea = c)}
+                        rows={3}
+                        defaultValue=""
+                        value={this.state.newMessage} 
+                        onChange={(event)=> this.setValue("newMessage", event) }
+                        class="typed-message-input"
+                        />
+       
+                     
+                        <i class="material-icons send-message-btn" 
+                            onClick={this.sendMessage.bind(this)}
+                        ><FaTelegramPlane/></i>
+                        <span className="character-count">{this.state.newMessage.length}/{this.MaxMessageLength}</span>
                     </div>
         
                 </div>
@@ -232,7 +285,30 @@ class Chat extends React.Component{
             </div>:
                 null
             }
+
+
+            <Modal  width="80%" visible={this.state.messageOptionsIsVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
+                <div>
+                <button> Report User</button>
+                 User will be removed when 3 users report or Admin bans.
+
+                </div>
+                
+            </Modal>
+
+
+
+
+
+
+
             </div>
+
+
+
+
+
+
         );
         
     }

@@ -6,6 +6,8 @@ import styleSheet from '../Styles/StyleSheet'
 import CustomInput from './CustomInput'
 import Room from '../Models/RoomModel'
 import React, { useState,  useEffect} from 'react';
+import { message} from 'antd';
+
 import io from 'socket.io-client';
 
 
@@ -13,6 +15,7 @@ import io from 'socket.io-client';
 
 function CreateRoom(props) {
 
+    //info for user sign up
     const [roomName, setRoomName] = useState("")
     const [userName, setUserName] = useState("")
     const [password, setPassword] = useState("")
@@ -23,17 +26,17 @@ function CreateRoom(props) {
     
     useEffect(() => {
 
+      //open up connection to set up room
       let socket_ = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
 
+      //save connection
       setSocket(socket_)
+
+      //once connected....
       socket_.on('connect', (connection) => {
-
         console.log("connected.")
-        //see if room exists
+        //get a code for the room
         socket_.emit('generate-code')
-
-
-        //if room does not exist
         socket_.on('generated-code', (code) => {
           setRoomCode(code)
         })
@@ -49,15 +52,19 @@ function CreateRoom(props) {
 
     function onCreateRoom(){
 
+      //validate user form
+      if(!userName){
+        message.error("please enter a user name.");
+        return
+      }
+
       //Create room object //create user object
-      let room = new Room("26", roomName, userName)
+      let room = new Room(roomCode, roomName, userName)
       let user = {userName: userName}
-      //update props
+      //update props// TODO: change to redux
       props.data.user = user
       props.data.room = room;
-      
       //change pages
-      console.log(props.data.room)
       props.history.push("/chat?="+roomCode)
 
 
@@ -74,35 +81,25 @@ function CreateRoom(props) {
                 onChange={(event) => setValue(setRoomName, event)}
                 value={roomName}
             />
+
             <CustomInput
                 title="Create a username."
                 placeholder="placeholder..."
                 onChange={(event) => setValue(setUserName, event)}
                 value={userName}
             />
-            <CustomInput
-                title="Create an admin password."
-                placeholder="placeholder..."
-                onChange={(event) => setValue(setPassword, event)}
-                value={password}
-            />
-
+  
             <div className="share-view">
-            <p className="caption">Share this code to your room.</p>
-            <p className="caption-subtitle">{roomCode}</p><br/>
-            <p className="caption">Share this url to your room.</p>
-            <p className="caption-subtitle">{roomCode}</p>
-            
-
+              <p className="caption">Share this code to your room.</p>
+              <p className="caption-subtitle">{roomCode}</p><br/>
+              <p className="caption">Share this url to your room.</p>
+              <p className="caption-subtitle">{"websitename.com/chat?="+roomCode}</p>
             </div>
-
-
 
             <button 
               onClick={onCreateRoom} 
               style={styleSheet.smallbutton}
-            >
-                create
+            > create
             </button>
 
       </div>
@@ -113,3 +110,18 @@ function CreateRoom(props) {
 }
 
 export default CreateRoom;
+
+
+/*
+
+
+         <CustomInput
+                title="Create an admin password."
+                placeholder="placeholder..."
+                onChange={(event) => setValue(setPassword, event)}
+                value={password}
+            />
+
+
+
+      */

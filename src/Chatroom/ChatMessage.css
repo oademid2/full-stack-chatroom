@@ -1,19 +1,114 @@
 .chat-message-view{
-    margin-top:20px;
-    margin-bottom: 20px;
+    margin:20px 0px;
     padding: 0px 20px;
     min-width: 100%;
     max-width: 100%;
     position: relative;
+    min-height: 20px;
+}
+
+
+.chat-message-text-view{
+    width: 85%;
+    background-color: rgb(237, 233, 233);
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.user .chat-message-text-view{
+    margin-left:15%;
+    background-color: rgb(164, 225, 253);
+
 
 }
 
-.chat-message-view.user{ 
-    text-align: left;
+.chat-message-text-view .header{
+    position: relative;
+}
+
+.username-text{
+    padding: 0px 0px 0px 0px;
+    font-weight: bold;
+    margin:0px;
+    font-size:14px;
+    display: inline-block;
+    width: auto;
+}
+
+.show-reaction-button{
+    padding: 2px 0px;
+    margin:0px;
+    font-size:18px;
+    position: relative;
+    display: inline-block;
+    float: right;
+    margin-left: auto;
+}
+
+.user .show-reaction-button{
+    display: ;
+}
+
+.reaction-bar{
+    padding: 2px 0px;
+    margin:0px;
+    font-size:10px;
+    position: relative;
+    display: inline-block;
+    float: right;
+    margin-left: auto;
+}
+
+.reaction-emoji{
+    padding: 0 0px;
+}
+.reaction-count{
+    padding: 0px 3px;
+}
+.reaction-tracking{
+    padding:3px;
+}
+
+.reaction-options{
+    padding: 0px 5px;
+    background-color: white;
+    border-radius: 10px;
+    border: 0.5px solid rgb(212, 209, 209);
+    white-space: nowrap;
+    position: absolute;
+    top:0px;
+    right:25px;
+    z-index: 1;
+}
+
+.reaction-options .option{
+    padding: 0px 6px;
+    font-size: 20px;
+    text-align: bottom;
+}
+
+.reaction-options.cshow{
+    max-width: 500px;
+    border: 0.5px solid rgb(212, 209, 209);
+    transition: all 0.5s ease;
+    overflow:hidden;
+}
+
+.reaction-options.chide{
+    max-width: 0px;
+    max-width: 0px;
+    padding: 0px 0px;
+    border: 0 solid rgb(212, 209, 209);
+    overflow:hidden;
+    transition: all 0.1s ease;
+    
 }
 
 .chat-message-text{
-    background-color: rgb(124, 210, 250);
+
+
     border-radius: 12px;
     display: inline-block;
     width: auto;
@@ -21,25 +116,21 @@
 
     min-width: 100%;
     max-width: 100%;
-    padding: 10px 14px;
+    padding: 0px 0px;
     margin:0px;
 
 }
 
-.chat-message-text.user{
-    background-color: lightgrey;
+
+
+
+
+
+
+
+
+.report-user-button{
+    color: rgb(255, 29, 29);
+
 }
 
-.username-text{
-    padding: 2px 0px;
-    margin:0px;
-    font-size:12px;
-}
-
-.message-options-view{
-    background-color: aqua;
-    min-width: 100px;
-    position: absolute;
-    bottom: -10px;
-    right:20px;
-}

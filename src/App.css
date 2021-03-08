@@ -40,17 +40,19 @@
 
 .app-title{
   text-align: center;
-  padding: 12px;
+  padding: 5px;
   font-family: Helvetica, Arial, sans-serif;
-  font-weight:bold;
-  font-size: 20px;
-  border-bottom: 1px solid rgb(211, 210, 210);
+  font-weight:lighter;
+  font-size: 10px;
+  border-bottom: 0px solid rgb(211, 210, 210);
   margin:0;
 }
 
 .app-body{
   background-color: #61dafb;
-
   min-height:650px;
-  display: flex;
+  max-width: 500px;
+  display: block;
+  position: relative;
+  /*display: flex;*/
 }

@@ -6,6 +6,17 @@ import Landing from './Landing/Landing'
 
 import * as util from './util'
 
+/*
+import {createStore} from 'redux'
+import TestRedux from './Landing/TestRedux';
+
+
+function reducer(state = {}, action){
+  return state;
+
+}
+const store = createStore(reducer);*/
+
 
 function App(props) {
   let history = useHistory();
@@ -18,8 +29,10 @@ function App(props) {
   
   return (
     <div className="App">
+        <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3pro.css"></link>
         <p class="app-title">
-          chatable.io 💬
+          chatable.io 
         </p>
         <div class="app-body">
 

@@ -97,7 +97,7 @@ function LandingPrompt(props) {
 
 
   return (
-      <div>
+      <div className="Landing-Prompt-Root">
           <div class="login-options-view">
 
           <div className="landing-header">

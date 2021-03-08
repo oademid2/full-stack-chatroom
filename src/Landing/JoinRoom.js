@@ -1,5 +1,5 @@
 import React, { useState,  useEffect} from 'react';
-import { Modal, Button } from 'antd';
+import { Modal, Button, message } from 'antd';
 import { withRouter} from 'react-router-dom';
 
 
@@ -34,7 +34,12 @@ function JoinRoom(props) {
 
     function onJoinRoom(){
 
-     
+     //check availability
+     if(!userName){
+       message.error("please enter a user name.");
+       return
+     }
+
       console.log(props.history)
       let socket = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
 
@@ -52,6 +57,9 @@ function JoinRoom(props) {
 
         socket.on('room-not-found', () => {
           //TODO: alert
+
+            message.error("room does not exist or is closed.");
+
           return
         })
 

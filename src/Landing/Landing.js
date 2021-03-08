@@ -15,7 +15,7 @@ function Landing(props) {
 
 
   return (
-    <div class="root">
+    <div class="landing-root">
 
 
       

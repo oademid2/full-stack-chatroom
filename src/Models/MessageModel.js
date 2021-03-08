@@ -5,6 +5,7 @@ export default class Message{
         this.userName = userName;
         this.id = id;
         this.userToken = tkn;
+        this.reactions = {}
     }
 
 }
