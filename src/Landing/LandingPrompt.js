@@ -97,7 +97,7 @@ function LandingPrompt(props) {
 
 
   return (
-      <div className="Landing-Prompt-Root">
+      <div className="landing-prompts-root">
           <div class="login-options-view">
 
           <div className="landing-header">
@@ -108,13 +108,13 @@ function LandingPrompt(props) {
 
           <div class="login-options-view">
           <button  
-              className="root-theme-button-med button-join-room"
+              className="root-theme-button-med prompt-btn"
               onClick= {onJoinRoom} 
             > 
               Join Room
             </button>
             <button  
-              className="root-theme-button-med button-create-room"
+              className="root-theme-button-med prompt-btn"
               onClick= {onCreateRoom} 
             > 
               Create Room

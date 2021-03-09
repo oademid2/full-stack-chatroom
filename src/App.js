@@ -6,6 +6,9 @@ import Landing from './Landing/Landing'
 
 import * as util from './util'
 
+
+
+
 /*
 import {createStore} from 'redux'
 import TestRedux from './Landing/TestRedux';
@@ -37,8 +40,8 @@ function App(props) {
         <div class="app-body">
 
           <Switch>
-            <Route  path='/chat' component={()=><ChatRoom data={data} util={util} history={history}  /> }></Route>
-            <Route  path='/' component={()=><Landing data={data} util={util} history={history}  />} ></Route>
+            <Route  path='/chat' component={()=><ChatRoom data={data}  util={util} history={history}  /> }></Route>
+            <Route  path='/' component={()=><Landing  data={data} util={util} history={history}  />} ></Route>
         </Switch>
 
 

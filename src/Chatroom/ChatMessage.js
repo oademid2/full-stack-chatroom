@@ -32,10 +32,10 @@ function ChatMessage(props) {
 
 
 
-            <div className="chat-message-text-view" onClick={props.onClick}>
+            <div className="chat-message-text-view">
 
               <div className="header">
-                <p class="username-text">{props.userName}</p> 
+                <p class="username-text"  onClick={props.onClick}>{props.userName}</p> 
                 {!props.isUser?<FaGrin  className="show-reaction-button" onClick={onToggleReactions} ></FaGrin>:null}
 
                 <div class={"reaction-options "+ (showReactions?"cshow":"chide")}>

@@ -1,6 +1,6 @@
 
 //FIREBASE CONFIG//
-import firebase from 'firebase';
+/*import firebase from 'firebase';
 require("firebase/firestore");
 
 
@@ -105,3 +105,4 @@ export {
     firebase,
     firestore
 }
+*/

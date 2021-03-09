@@ -75,8 +75,6 @@ class Chat extends React.Component{
 
 
     set(field, value){
-        if(field == "newMessage") 
-            if(value.length >140)return
         this.setState({[field]: value})
     }
 
@@ -152,6 +150,9 @@ class Chat extends React.Component{
     }
 
     updateNewMessage(event){
+
+        console.log(event.target.value, event.target.value.length, event.target.value.substring(0,this.MaxMessageLength))
+        if(event.target.value.length>this.MaxMessageLength)return this.set("newMessage" ,event.target.value.substring(0,this.MaxMessageLength))
         this.set("newMessage" ,event.target.value)
     }
 
@@ -211,7 +212,7 @@ class Chat extends React.Component{
     render(){
 
         return (
-            <div class="root-2">
+            <div class="page-root chatroom-root">
             {this.state.room && this.state.status !== "closed" ?
                 <div class="chatroom-view">
                 
@@ -255,7 +256,7 @@ class Chat extends React.Component{
                         rows={3}
                         defaultValue=""
                         value={this.state.newMessage} 
-                        onChange={(event)=> this.setValue("newMessage", event) }
+                        onChange={this.updateNewMessage.bind(this) }
                         class="typed-message-input"
                         />
        
@@ -288,10 +289,8 @@ class Chat extends React.Component{
 
 
             <Modal  width="80%" visible={this.state.messageOptionsIsVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
-                <div>
-                <button> Report User</button>
-                 User will be removed when 3 users report or Admin bans.
-
+                <div className="message-info-modal">
+                <button > Remove User</button>
                 </div>
                 
             </Modal>

@@ -1,6 +1,6 @@
 
 //FIREBASE CONFIG//
-import firebase from 'firebase';
+/*import firebase from 'firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
 
@@ -108,3 +108,4 @@ export {
     firebase,
     firestore
 }
+*/
