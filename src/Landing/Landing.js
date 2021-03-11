@@ -1,4 +1,7 @@
-import { Redirect, BrowserRouter as Router, Route, Switch, withRouter} from 'react-router-dom';
+import { Redirect, BrowserRouter as Router, Route, Switch, withRouter, useLocation} from 'react-router-dom';
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+import{ useState} from 'react';
+
 import React from 'react';
 
 
@@ -11,8 +14,10 @@ import './Landing.css';
 
 
 function Landing(props) {
-  console.log(props.history.location.pathname )
-
+  console.log(props.history.location )
+  
+  let location = useLocation();
+  const [tr, setTr] = useState("slide");
 
   return (
     <div class="landing-root">
@@ -21,12 +26,26 @@ function Landing(props) {
       
 
       <Router>
+      <TransitionGroup component="div" className="app-body" >
+
+      <CSSTransition
+                key={location.key}
+                in={true}
+                appear={true}
+                classNames={tr}
+                timeout={900}
+              >
+
           <Switch>
 
-          <Route path='/joinroom' component={()=> <JoinRoom history={props.history} {...props}  />}></Route>
-          <Route path='/createroom' component={()=> <CreateRoom  {...props} history={props.history}  {...props} />}></Route>
-          <Route path='/' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
+            <Route path='/joinroom' component={()=> <JoinRoom history={props.history} {...props}  />}></Route>
+            <Route path='/createroom' component={()=> <CreateRoom  {...props} history={props.history}  {...props} />}></Route>
+            <Route exact path='/' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
+            <Route path='*' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
         </Switch>
+        </CSSTransition>
+        </TransitionGroup>
+
        </Router>
  
 

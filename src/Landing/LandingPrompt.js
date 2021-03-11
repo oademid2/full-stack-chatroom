@@ -1,6 +1,10 @@
 import React, { useEffect, useState} from 'react';
 import { withRouter } from "react-router";
+import { Link, useLocation, useHistory} from 'react-router-dom';
+
 import "antd/dist/antd.css";
+import '../App.css';
+
 
 // import styleSheet from '../Styles/StyleSheet'
 import JoinRoom from './JoinRoom'
@@ -18,6 +22,8 @@ import './LandingPrompts.css';
 function LandingPrompt(props) {
 
 
+  const location = useLocation();
+  const history = useHistory();
 
   const [createAccountDrawerVisible, setCreateAccountDrawerVisible] = useState(false);
   
@@ -39,6 +45,8 @@ function LandingPrompt(props) {
   function onCreateRoom(){
 
     props.history.push("/createroom")
+    console.log(history)
+    //history.push("/createroom")
     /*//Create room object //create user object
     let room = new Room(25, "roomName", "admin")
     let user = {userName: "admin"}
@@ -54,6 +62,9 @@ function LandingPrompt(props) {
 
   }
 
+  function reset(){
+    localStorage.clear()
+  }
   function onJoinRoom(){
 
     props.history.push("/joinroom")
@@ -113,12 +124,16 @@ function LandingPrompt(props) {
             > 
               Join Room
             </button>
+            <Link to="/createroom" className="root-theme-button-med prompt-btn">
+             test
+            </Link> 
             <button  
               className="root-theme-button-med prompt-btn"
               onClick= {onCreateRoom} 
             > 
               Create Room
             </button>
+            <button onClick={reset}>reset</button>
 
             <div className="landing-footer">
             </div>

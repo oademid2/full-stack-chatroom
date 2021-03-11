@@ -18,6 +18,7 @@ function ChatMessage(props) {
   function readEmoji(emoji){
     if(emoji[0] != '&')return emoji
     let pair = emoji.substring(1).split('&');
+    console.log(pair)
     return pair
 
 
@@ -35,7 +36,7 @@ function ChatMessage(props) {
 
               <div className="header">
                 <p class="username-text"  onClick={props.onClick}>{props.userName}</p> 
-                {/*!props.isUser?<FaGrin  className="show-reaction-button" onClick={onToggleReactions} ></FaGrin>:null*/}
+                {!props.isUser?<FaGrin  className="show-reaction-button" onClick={onToggleReactions} ></FaGrin>:null}
 
                 <div class={"reaction-options "+ (showReactions?"cshow":"chide")}>
                     {   reactionOptions.map(
@@ -80,11 +81,6 @@ function ChatMessage(props) {
                   {props.text}
               </p>
   
-        </div>
-
-        <div className="options-left-view">
-        {!props.isUser?<FaGrin  className="" onClick={onToggleReactions} ></FaGrin>:null}
-
         </div>
 
         

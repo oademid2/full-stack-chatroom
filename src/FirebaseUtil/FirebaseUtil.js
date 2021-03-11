@@ -2,6 +2,7 @@
 //FIREBASE CONFIG//
 import firebase from 'firebase';
 import 'firebase/firestore';
+import {UserService} from './UserService'
 
 
 var firebaseConfig = {
@@ -19,6 +20,8 @@ firebase.initializeApp(firebaseConfig)
 
 //DATABASE INIT
 const firestore = firebase.firestore();
+var database = firebase.database();
+
 const chatroomsDB = firestore.collection('chatrooms');
 const usersDB = firestore.collection('users');
 //const messagesRef = firestore.collection('messages');
@@ -27,27 +30,78 @@ const usersDB = firestore.collection('users');
 //Functional groups
 class FirebaseUtil  {
 
-     static async userCheckIn(userName){
+     static async getUserToken(){
 
-          if(!localStorage.getItem("user-token")){
+          if(!UserService.getUserID()){
   
-              const apiCompletionPromise = usersDB.add({
-                  name: userName
+              let userID = await usersDB.add({
+                  name: "none",
+                  type: "annon"
+              }).then(res =>{
+                  UserService.setUserID(res.id)
+                  //localStorage.setItem("user-token", res.id)
+                  console.log("generating new profile: ", res.id)
+                  return res.id
               })
-  
-              return apiCompletionPromise
+
+              return userID
+
+          }else{
+                console.log("returning user: ",UserService.getUserID())
+                return UserService.getUserID();
           }
     }
+    
+    static async findRoomById(roomID){
 
-    static async createRoom(userName, adminId, roomName){
+        let room;
+        console.log(roomID)
+        await chatroomsDB.doc(roomID).get().then((doc) => {
 
-        const apiCompletionPromise = chatroomsDB.add({
-            admin: userName,
-            adminId: adminId,
-            roomName: roomName
+            console.log(doc)
+            if(doc) room =doc.data()
         })
 
-        return apiCompletionPromise
+        console.log(room)
+
+        return room
+        
+    }
+    static async createRoom( roomName, adminID){
+
+        let code = stringGen(6);
+        chatroomsDB.get().then((querySnapshot) => {
+
+            let duplicatedCode = true;
+            do{
+                code = stringGen(6);
+                //querySnapshot.docs.forEach(doc => null)
+                duplicatedCode = querySnapshot.docs.find(doc => (doc.data()).code == code)
+                console.log("code is: ",code)
+            }while(duplicatedCode)
+
+            console.log("code is not duplicated: ",code)
+
+        }).catch((error) => {
+                console.log("Error getting documents: ", error);
+        })
+
+        let room = {
+            adminID: adminID,
+            roomName: roomName,
+            roomCode: code,
+            type: "temporary",
+            timeStamp: ""//firestore.FieldValue.serverTimestamp()
+        }
+
+        await chatroomsDB.add(room).then(doc => room.id = doc.id)
+
+        return room
+        //return apiCompletionPromise
+          
+        
+
+      
 
   }
 
@@ -60,3 +114,13 @@ export {
     FirebaseUtil
 }
 
+function stringGen(len) {
+    var text = "";
+    
+    var charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    
+    for (var i = 0; i < len; i++)
+        text += charset.charAt(Math.floor(Math.random() * charset.length));
+    
+    return text;
+    }

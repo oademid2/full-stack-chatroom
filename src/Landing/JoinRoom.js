@@ -41,7 +41,7 @@ function JoinRoom(props) {
      }
 
       console.log(props.history)
-      let socket = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
+      let socket = io("http://192.168.1.9:1234", { transport: ['websocket']}) ;
 
       socket.on('connect', (connection) => {
 

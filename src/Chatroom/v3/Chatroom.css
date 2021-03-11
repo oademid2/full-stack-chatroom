@@ -36,8 +36,9 @@ p{
     position: relative;
     display: inline-block;
     width:100%;
-    min-height:7vh;
-    background-color: none;
+    min-height:10vh;
+    background-color: blueviolet;
+
 
 }
 
@@ -103,7 +104,7 @@ p{
     max-width: 100%;
     min-height: 76vh;
     max-height: 76vh;
-    background-color: none;
+    background-color: aquamarine;
 
 }
 

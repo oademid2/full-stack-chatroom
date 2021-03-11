@@ -1,4 +1,4 @@
-import './chatroom.css';
+import './Chatroom.css';
 import { withRouter} from 'react-router-dom';
 
 import React from 'react';
@@ -9,17 +9,14 @@ import autosize from "autosize";
 
 import ChatMessage from './ChatMessage';
 import SocketManager from './Socket'
+import Message from '../Models/MessageModel'
 
 import { FaTelegramPlane } from "react-icons/fa";
 import { Modal, Button } from 'antd';
+import { UserService } from '../FirebaseUtil/UserService';
+import { FirebaseUtil } from '../FirebaseUtil/FirebaseUtil';
+import User from '../Models/UserModel';
 
-
-
-
-
-
-
-// "bnh5yzdirjinqaorq0ox1tf383nb3xr"
 
 class Chat extends React.Component{
 
@@ -28,49 +25,110 @@ class Chat extends React.Component{
 
         super(props)
 
-        this.socket = null; 
-        this.MaxMessageLength = 140;
+        this.state = {
+            room: null,
+            user: null,
+            isAdmin: "",
+            newMessage: "",
+            messages: [],
+            status: "",
+            messageOptionsIsVisible: false,
+            render:false
+        }
 
-
-        if(!props.data.room) props.history.push("/")
-
-        let room_ = props.data.room//new Room("25", "love isalnd ❤️", "kit")//props.data.room
-        let user_ = props.data.user//{userName: props.data.user.userName} //props.data.user_
-        let isAdmin_ = room_ ?  (room_.admin === user_.userName? true: false):null //==
-        let token_= props.data.persistentToken? props.data.persistentToken: null;
-        console.log("token is: ", token_)
-
+        ////bind functions
+        this.textarea = <textarea/>
+        this.messagesEnd = <div/>
+        this.showModal = this.showModal.bind(this)
         this.removeMessage =this.removeMessage.bind(this)
         this.onAddReaction = this.onAddReaction.bind(this)
         this.showMessageOptions = this.showMessageOptions.bind(this)
 
-        this.state ={
-            room: room_,
-            user: user_,
-            isAdmin: isAdmin_,
-            newMessage: "",
-            messages: [],
-            status: "loading",
-            messageOptionsIsVisible: false
-        }
-
-        if(!this.state.room)this.props.history.push("/")
+        //other variables
+        this.MaxMessageLength = 140;
+        this.socket = null; 
+        this.room = null;
         
     }
 
-    
+
     componentDidMount(){
-        if(!this.state.room)this.props.history.push("/")
-        else{
-            this.connectSocket()
-            this.socketEvents()
+
+        //query parameters
+        let queryParams = {}
+        try{
+            let searchString = this.props.history.location.search.substring(1).split('&')
+            let pair = []
+            for(var i=0;i<searchString.length;i++){
+                pair = searchString[i].split('=')
+                queryParams[pair[0]] = pair[1]
+            }
+            //if no room in parameters status 404
+            if(!queryParams.room)  return this.setState({status: "404"})
+        }catch(err){
+            //if paramaters not complete status 404
+            console.log("query paramater err: ", err)
+            this.setState({render: true})
+            this.setState({status: "404"})
+            return
+            
         }
-        this.textarea.focus();
+
+
+        ( async() => {
+        /////find room
+        let room ;
+        if(this.props.location.state) room = this.props.location.state.room
+        else room = await FirebaseUtil.findRoomById(queryParams.room)
+
+        //if room not found then render a ror page
+        if(!room){
+            this.setState({status: "404"})
+            this.setState({render: true})
+            return
+        }
+
+        this.room = room;
+        //set state
+        this.setState({
+            room: room,
+            user: {userName:"anon", userID: UserService.token() },
+            isAdmin: room.adminID == UserService.token(),
+            newMessage: "",
+            messages: [],
+            status: "200",
+            messageOptionsIsVisible: false,
+            modalVisible: false,
+            modalState:"",
+            render:true
+        })
+
+        console.log("this room is: ", room)
+
+        //connect sockets
+        this.connectSocket()
+        this.socketEvents()
+
         autosize(this.textarea);
+
+
+    })()
+
+    }
+
+    queryParameters(){
+        let queryParams = {}
+        let searchString = this.props.history.location.search.substring(1).split('&')
+        let pair = []
+
+        for(var i=0;i<searchString.length;i++){
+            pair = searchString[i].split('=')
+            queryParams[pair[0]] = pair[1]
+        }
     }
 
     connectSocket(){
-        this.socket = io("http://192.168.1.9:3000", { transport: ['websocket']}) ;
+        this.socket = io("http://192.168.1.9:1234", { transport: ['websocket']}) ;
     }
 
 
@@ -87,7 +145,7 @@ class Chat extends React.Component{
             if(this.state.isAdmin){
                 SocketManager.createRoom(this)
             }else{
-                this.socket.emit('join-room', this.state.room.roomCode,  this.props.data.persistentToken)
+                this.socket.emit('join-room', this.room.roomCode,  UserService.token())
             }
             console.log("connected.")
 
@@ -100,18 +158,23 @@ class Chat extends React.Component{
 
             this.socket.on('backlog-messages', (messages_) => {
                 this.set("messages",messages_ )
-                this.set("status", "loaded")
+                this.set("status", "200")
+                console.log("backlog: ", messages_)
+
+                
+
 
             });
 
             this.socket.on('broadcasted-message', (message) => {
+                console.log("received")
                 this.set("messages", [...this.state.messages,message])
             });
 
             this.socket.on('room-ended', () => {
                 console.log("room ended. ")
-                this.socket.close()
                 this.detachFromRoom()
+                this.set("status", "exit")
             });
 
             this.socket.on('removed-message', (messages_) => {
@@ -157,20 +220,24 @@ class Chat extends React.Component{
     }
 
     sendMessage(){
-        this.socket.emit("broadcast-message", this.state.room.roomCode, this.state.newMessage, this.state.user.userName, this.props.data.persistentToken)
+        let msg = new Message(this.state.room.roomCode, this.state.newMessage, this.state.user.userName, UserService.token())
+        //this.socket.emit("broadcast-message", this.state.room.roomCode, this.state.newMessage, this.state.user.userName, this.props.data.persistentToken)
+        this.socket.emit("broadcast-message", this.state.room.roomCode, msg)
         this.set("newMessage", "")
     }
 
     endRoom(){
+        console.log('end')
         this.socket.emit("end-room", this.state.room.roomCode)
         this.detachFromRoom()
+        this.setState({status: "exit"})
     }
 
     detachFromRoom(){
-        this.set("room",null)
+        //this.set("room",null)
         this.socket.close()
-        this.socket = null;
-        this.set("status", "closed")
+        delete this.socket;
+        //this.set("status", "exit")
     }
 
     leaveRoom(){
@@ -199,107 +266,152 @@ class Chat extends React.Component{
     }
 
     closeMessageOptions(){
+        this.setState({modalVisible: false})
+        this.setState({modalState: ""})
         this.setState({messageOptionsIsVisible: false})
     }
 
 
     showMessageOptions(msg){
-        console.log(msg)
         this.setState({messageOptionsIsVisible: true})
     }
 
+    scrollToBottom = () => {
+        this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+      }
+    componentDidUpdate(prevState, currState) {
+        //console.log(prevState, currState)
+        if(this.state.render && this.state.status =="200")this.scrollToBottom();
+      }
+
+      showModal(state){
+          console.log(state)
+          this.setState({modalState: state})
+          this.setState({modalVisible: true})
+          
+      }
   
     render(){
 
         return (
-            <div class="page-root chatroom-root">
-            {this.state.room && this.state.status !== "closed" ?
-                <div class="chatroom-view">
-                
-                <div class="title-view">
-     
-                    <span class="title-text">{this.state.room.roomName}</span>
-                    {/*this.state.isAdmin?
-                        <p class="title-leave-btn"  onClick={this.endRoom.bind(this)}>end room</p>:
-                        <p class="title-leave-btn"  onClick={this.leaveRoom.bind(this)}>leave</p>
-                    */ }
-                    <span class="leave-text">leave</span>
-
-        
-                </div>
-              
-                <div class="chatroom-messages-view">
             
-                    {this.state.messages?
-                    <div>
-                        {this.state.messages.map(msg=> 
-                        <ChatMessage 
-                            onClick={()=> this.showMessageOptions(msg)} 
-                            onReportMessage={this.removeMessage}
-                            message ={msg}
-                            key={msg.id} 
-                            text={msg.message} 
-                            userName={msg.userName } 
-                            reactions = {msg.reactions}
-                            onAddReaction={(emoji=>this.onAddReaction(emoji, msg))}
-                            isUser={this.state.user.userName === msg.userName}/>)}
-                    </div>
+            <div class="page-root chatroom-root">
+                test
+                {!this.state.render? <div>Loading</div>:null}
+                {(this.state.render && this.state.status=="404")? <div>STATUS 404</div>:null}
+                {(this.state.render && this.state.status=="exit")? <div>room ended by admin.</div>:null}
+                {(this.state.render && this.state.status =="200" )?
+                    <div> {this.state.room && this.state.status != "closed" ?
+                        <div class="chatroom-view">
+                        
+                        <div class="title-view">
+            
+                            <span class="title-text">{this.state.room.roomName}</span>
+                            {/*this.state.isAdmin?
+                                <p class="title-leave-btn"  onClick={this.endRoom.bind(this)}>end room</p>:
+                                <p class="title-leave-btn"  onClick={this.leaveRoom.bind(this)}>leave</p>
+                            */ }
+                        {this.state.isAdmin?
+                                <span onClick={()=>this.showModal("end-room")}class="leave-text">end</span>:
+                                <span onClick={this.leaveRoom.bind(this)} class="leave-text">leave</span>
+                        }
+
+                
+                        </div>
+                    
+                        <div class="chatroom-messages-view">
+                    
+                            {this.state.messages?
+                            <div>
+                                {this.state.messages.map(msg=> 
+                                <ChatMessage 
+                                    onClick={()=> this.showMessageOptions(msg)} 
+                                    onReportMessage={this.removeMessage}
+                                    message ={msg}
+                                    key={msg.messageID} 
+                                    text={msg.message} 
+                                    userName={msg.userName } 
+                                    reactions = {msg.reactions}
+                                    onAddReaction={(emoji=>this.onAddReaction(emoji, msg))}
+                                    isUser={UserService.token()=== msg.userToken }/>)}
+                                       <div style={{ float:"left", clear: "both" }}
+                                ref={(el) => { this.messagesEnd = el; }}>
+                            </div>
+                            </div>
+                                :null
+                                 }
+                
+                            </div>
+                         
+
+                            <div class="typed-message-view">
+                            <textarea
+                                class="typed-message-input"
+                                ref={c => (this.textarea = c)}
+                                rows={3}
+                                defaultValue=""
+                                value={this.state.newMessage} 
+                                onChange={this.updateNewMessage.bind(this) }
+                                class="typed-message-input"
+                                />
+            
+                            
+                                <i class="material-icons send-message-btn" 
+                                    onClick={this.sendMessage.bind(this)}
+                                ><FaTelegramPlane/></i>
+                                <span className="character-count">{this.state.newMessage.length}/{this.MaxMessageLength}</span>
+                            </div>
+                
+                        </div>
                         :null
                     }
-        
+
+                    {this.state.status === "closed"?
+                    <div>
+                        <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
+                        <p> room is closed.</p>
+                    </div>:
+                        null
+                    }
+
+                    {this.state.status === "banned"?
+                    <div>
+                        <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
+                        <p> you've been removed.</p>
+                    </div>:
+                        null
+                    }
+
+
+                    <Modal  width="80%" visible={this.state.modalVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
+                    <div className="message-info-modal">
+                        {this.state.modalState == "end-room"?
+                            <div>
+                                Are you sure you want to end room? All members will be kicked out.
+                                <button onClick={this.endRoom.bind(this)}> End Room</button>
+
+                            </div>:null
+                        }
+
+                        {this.state.modalState == "ban-user"?
+                            <div>
+                            <button > Remove User</button>
+                            </div>:null
+                        }
+                    </div>
+                        
+                        
+                        
+                    </Modal>
+
+
+
+
+
                     </div>
 
-                    <div class="typed-message-view">
-                    <textarea
-                        class="typed-message-input"
-                        ref={c => (this.textarea = c)}
-                        rows={3}
-                        defaultValue=""
-                        value={this.state.newMessage} 
-                        onChange={this.updateNewMessage.bind(this) }
-                        class="typed-message-input"
-                        />
-       
-                     
-                        <i class="material-icons send-message-btn" 
-                            onClick={this.sendMessage.bind(this)}
-                        ><FaTelegramPlane/></i>
-                        <span className="character-count">{this.state.newMessage.length}/{this.MaxMessageLength}</span>
-                    </div>
-        
-                </div>
-                :null
-            }
-
-            {this.state.status === "closed"?
-            <div>
-                <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
-                <p> room is closed.</p>
-            </div>:
-                null
-            }
-
-            {this.state.status === "banned"?
-            <div>
-                <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
-                <p> you've been removed.</p>
-            </div>:
-                null
-            }
-
-
-            <Modal  width="80%" visible={this.state.messageOptionsIsVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
-                <div className="message-info-modal">
-                <button > Remove User</button>
-                </div>
-                
-            </Modal>
-
-
-
-
-
-
+                    :null
+                }
 
             </div>
 
@@ -309,6 +421,7 @@ class Chat extends React.Component{
 
 
         );
+
         
     }
     

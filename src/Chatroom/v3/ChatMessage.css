@@ -10,7 +10,7 @@
 
 .chat-message-text-view{
     width: 85%;
-    background-color: rgb(246, 246, 246);
+    background-color: rgb(237, 233, 233);
     padding: 10px;
     border-radius: 10px;
     display: inline-block;
@@ -48,23 +48,15 @@
 }
 
 .user .show-reaction-button{
+    display: ;
+}
 
-    
-}
-.options-left-view{
-    width:10%;
-    position: relative;
-    display: inline-block;
-    font-size:25px;
-    padding: 0 0 0 10px;
-    color: rgb(175, 175, 175);
-}
 .reaction-bar{
     padding: 2px 0px;
     margin:0px;
     font-size:10px;
     position: relative;
-    display: block;
+    display: inline-block;
     float: right;
     margin-left: auto;
 }
@@ -86,8 +78,8 @@
     border: 0.5px solid rgb(212, 209, 209);
     white-space: nowrap;
     position: absolute;
-    top:8px;
-    right:-15px;
+    top:0px;
+    right:25px;
     z-index: 1;
 }
 

@@ -1,12 +1,8 @@
-export default class Room{
+export default class User{
 
-    constructor(roomID, roomCode, roomName, adminID) { 
-        this.roomID = roomID;
-        this.roomCode = roomCode;
-        this.roomName = roomName;
-        this.adminID = adminID;
-       
-       
+    constructor(userName, userToken) { 
+        this.userName = userName;
+        this.userToken = userToken;
     }
 
 

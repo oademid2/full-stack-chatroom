@@ -1,11 +1,13 @@
 export default class Message{
 
-    constructor(message, userName, id, tkn) { 
+    constructor(roomCode, message, userName, tkn, id) { 
+        this.roomCode = roomCode;
         this.message = message;
         this.userName = userName;
-        this.id = id;
+        this.messageID = id;
         this.userToken = tkn;
         this.reactions = {}
+        this.reactors = {}
     }
 
 }
