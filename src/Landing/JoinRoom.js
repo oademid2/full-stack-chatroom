@@ -2,6 +2,10 @@ import React, { useState,  useEffect} from 'react';
 import { Modal, Button, message } from 'antd';
 import { withRouter} from 'react-router-dom';
 
+//custom imports
+import {FirebaseUtil} from '../FirebaseUtil/FirebaseUtil';
+import {UserService} from '../FirebaseUtil/UserService';
+
 
 import styleSheet from '../Styles/StyleSheet'
 import './JoinRoom.css';
@@ -32,7 +36,7 @@ function JoinRoom(props) {
 
 
 
-    function onJoinRoom(){
+    async function onJoinRoom(){
 
      //check availability
      if(!userName){
@@ -43,17 +47,30 @@ function JoinRoom(props) {
       console.log(props.history)
       let socket = io("http://192.168.1.9:1234", { transport: ['websocket']}) ;
 
+      //create user profile
+      let userID  = "123"//await FirebaseUtil.getUserToken();
+      let user = {userName: userName, userID: userID}
+      UserService.login(user)
+      props.data.user = user
+
+
+
       socket.on('connect', (connection) => {
 
         //see if room exists
-        socket.emit('find-room', roomCode)
+        socket.emit('find-room', roomCode, UserService.getUserID())
 
         //if room does not exist
-        socket.on('user-is-banned', () => {
+        socket.on("user-is-banned", () => {
           console.log('user-is-banned')
+          message.error("You've been blocked from this room.");
+
           //TODO: alert
           return
         })
+
+
+      
 
         socket.on('room-not-found', () => {
           //TODO: alert
@@ -68,7 +85,7 @@ function JoinRoom(props) {
         socket.on('room-found', (room) => {
           props.data.user = {userName: userName};
           props.data.room = room;
-          props.history.push("/chat?code="+roomCode)
+          props.history.push("/chat?room="+room.roomID)
           //props.pushHistory("/chat?code="+roomCode)
 
         })

@@ -57,12 +57,12 @@ function CreateRoom(props) {
       props.data.user = user
       
       //create a room
-      let room = await FirebaseUtil.createRoom( roomName, UserService.token())
+      let room = await FirebaseUtil.createRoom( roomName, UserService.getUserID())
 
       //go to chatroom
       props.history.push({
         pathname: '/chat',
-        search: "?room="+room.id,
+        search: "?room="+room.roomID,
         state: { create:true, room: room, user: user }
       })
         //Create room object //create user object
@@ -126,7 +126,7 @@ function CreateRoom(props) {
   );
 }
 
-export default withRouter(CreateRoom);
+export default CreateRoom;
 
 
 /*

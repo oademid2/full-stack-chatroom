@@ -26,13 +26,23 @@ function Landing(props) {
 
 
     <div className="landing-root-header">
-
+    <Link to="/createroom">Red</Link>
+        <Link to="/joinroom">Green</Link>
 
     </div>
       
 
 
        
+      <TransitionGroup component="div" >
+
+          <CSSTransition
+                key={location.key}
+                in={true}
+                appear={true}
+                classNames={tr}
+                timeout={900}
+              >
 
               <Switch>
 
@@ -41,7 +51,8 @@ function Landing(props) {
                 <Route exact path='/' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
                 <Route path='*' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
             </Switch>
-
+          </CSSTransition>
+        </TransitionGroup>
 
 
  

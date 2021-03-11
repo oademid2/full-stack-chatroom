@@ -48,15 +48,24 @@ function App(props) {
        {/* <p class="app-title">
           chatable.io 
   </p>*/}
+        <Link to="/">create</Link>
+        <Link to="/chat">join</Link>
 
-                <div className="app-body">
+        <TransitionGroup component="div" className="app-body" >
+        <CSSTransition
+                  key={location.key}
+                  in={true}
+                  appear={true}
+                  classNames={tr}
+                  timeout={900}
+                >
                 <Switch>
                   <Route  path='/chat' component={()=><ChatRoom data={data}  util={util} history={history}  /> }></Route>
                   <Route  path='/' component={()=><Landing  data={data} util={util} history={history}  />} ></Route>
               </Switch>
-              </div>
 
-
+        </CSSTransition>
+        </TransitionGroup>
         </div>
 
       

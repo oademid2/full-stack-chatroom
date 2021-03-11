@@ -99,7 +99,7 @@ class Chat extends React.Component{
             status: "200",
             messageOptionsIsVisible: false,
             modalVisible: false,
-            modalState:"",
+            modal:{state:""},
             render:true
         })
 
@@ -143,9 +143,10 @@ class Chat extends React.Component{
         this.socket.on('connect', (connection) => {
            
             if(this.state.isAdmin){
+                console.log(UserService.getUserID())
                 SocketManager.createRoom(this)
             }else{
-                this.socket.emit('join-room', this.room.roomCode,  UserService.token())
+                this.socket.emit('join-room', this.room.roomCode,  UserService.getUserID())
             }
             console.log("connected.")
 
@@ -177,8 +178,12 @@ class Chat extends React.Component{
                 this.set("status", "exit")
             });
 
-            this.socket.on('removed-message', (messages_) => {
+            this.socket.on('removed-message', (messages_, userID) => {
                 this.set("messages",messages_ )
+                if(userID == UserService.getUserID()) this.setState({status:"303"})
+                console.log(userID)
+                console.log(UserService.getUserID())
+                console.log(userID == UserService.getUserID())
                 console.log("messages updated: ", messages_)
             });
 
@@ -256,8 +261,7 @@ class Chat extends React.Component{
     }
 
     removeMessage(msg){
-        alert("user will be banned")
-        console.log(msg,  this.state.room.roomCode, msg)
+        console.log("removing: ", msg,  this.state.room.roomCode, msg)
         this.socket.emit("ban-user", this.state.room.roomCode, msg)
     }
 
@@ -267,7 +271,7 @@ class Chat extends React.Component{
 
     closeMessageOptions(){
         this.setState({modalVisible: false})
-        this.setState({modalState: ""})
+        this.setState({modal: {state:""}})
         this.setState({messageOptionsIsVisible: false})
     }
 
@@ -284,9 +288,9 @@ class Chat extends React.Component{
         if(this.state.render && this.state.status =="200")this.scrollToBottom();
       }
 
-      showModal(state){
+      showModal(state,data=null){
           console.log(state)
-          this.setState({modalState: state})
+          this.setState({modal: {state:state, data:data}})
           this.setState({modalVisible: true})
           
       }
@@ -296,10 +300,11 @@ class Chat extends React.Component{
         return (
             
             <div class="page-root chatroom-root">
-                test
                 {!this.state.render? <div>Loading</div>:null}
                 {(this.state.render && this.state.status=="404")? <div>STATUS 404</div>:null}
                 {(this.state.render && this.state.status=="exit")? <div>room ended by admin.</div>:null}
+                {(this.state.render && this.state.status=="303")? <div>you've been removed from this room.</div>:null}
+
                 {(this.state.render && this.state.status =="200" )?
                     <div> {this.state.room && this.state.status != "closed" ?
                         <div class="chatroom-view">
@@ -325,7 +330,7 @@ class Chat extends React.Component{
                             <div>
                                 {this.state.messages.map(msg=> 
                                 <ChatMessage 
-                                    onClick={()=> this.showMessageOptions(msg)} 
+                                    onClick={()=> this.showModal("ban-user",msg)} 
                                     onReportMessage={this.removeMessage}
                                     message ={msg}
                                     key={msg.messageID} 
@@ -385,7 +390,7 @@ class Chat extends React.Component{
 
                     <Modal  width="80%" visible={this.state.modalVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
                     <div className="message-info-modal">
-                        {this.state.modalState == "end-room"?
+                        {this.state.modal.state == "end-room"?
                             <div>
                                 Are you sure you want to end room? All members will be kicked out.
                                 <button onClick={this.endRoom.bind(this)}> End Room</button>
@@ -393,9 +398,9 @@ class Chat extends React.Component{
                             </div>:null
                         }
 
-                        {this.state.modalState == "ban-user"?
+                        {this.state.modal.state == "ban-user"?
                             <div>
-                            <button > Remove User</button>
+                            <button onClick={()=>this.removeMessage(this.state.modal.data)}> Remove User</button>
                             </div>:null
                         }
                     </div>

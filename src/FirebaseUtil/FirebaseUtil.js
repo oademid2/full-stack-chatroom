@@ -43,7 +43,6 @@ class FirebaseUtil  {
                   console.log("generating new profile: ", res.id)
                   return res.id
               })
-
               return userID
 
           }else{
@@ -59,7 +58,10 @@ class FirebaseUtil  {
         await chatroomsDB.doc(roomID).get().then((doc) => {
 
             console.log(doc)
-            if(doc) room =doc.data()
+            if(doc){
+                 room =doc.data()
+                 room.roomID = doc.id
+            }
         })
 
         console.log(room)
@@ -94,7 +96,7 @@ class FirebaseUtil  {
             timeStamp: ""//firestore.FieldValue.serverTimestamp()
         }
 
-        await chatroomsDB.add(room).then(doc => room.id = doc.id)
+        await chatroomsDB.add(room).then(doc => room.roomID = doc.id)
 
         return room
         //return apiCompletionPromise

@@ -2,6 +2,9 @@
 import './ChatMessage.css';
 import { FaGrin, FaExclamationCircle } from "react-icons/fa";
 import{ useState} from 'react';
+import { FacebookCounter } from 'react-reactions';
+
+
 
 
 
@@ -22,6 +25,10 @@ function ChatMessage(props) {
     return pair
 
 
+  }
+
+  function countEmoji(){
+    
   }
 
 
@@ -58,13 +65,18 @@ function ChatMessage(props) {
 
 
 
-                <div class={"username-text reaction-bar "}>
+
+                 <div class={"username-text reaction-bar "}>
+                   <span>test</span>
+      
+
                   { Object.keys(props.reactions).map((emoji)=>{
               
                       let code = ""
                       if(emoji[0] != '&')code = String.fromCodePoint(emoji)
                       else code = String.fromCodePoint.apply(String, readEmoji(emoji))
                       return(
+                  
                             <span class={"reaction-tracking"} key={emoji}>
                               <span class={"reaction-emoji"}>{props.reactions[emoji] > 0? props.reactions[emoji]: ""}</span>
                             <span class={"reaction-count"} >{code}</span>
