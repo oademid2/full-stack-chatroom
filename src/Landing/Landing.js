@@ -6,41 +6,44 @@ import React from 'react';
 
 
 import LandingPrompt from './LandingPrompt'
-import CreateRoom from './CreateRoom'
+import CreateRoom from './CreateRoom/CreateRoom'
 import JoinRoom from './JoinRoom'
 
 import '../Styles/root-themes.css';
 import './Landing.css';
-import '../transitions.css';
 
 function Landing(props) {
   console.log(props.history.location )
 
 
+  //const [UserService, setUserService] = useState(props.UserService)
+
   let location = useLocation();
-  const [tr, setTr] = useState("slide");
-  console.log(location.key)
+
+  console.log(location)
 
   return (
     <div class="landing-root">
 
 
-    <div className="landing-root-header">
-
-
-    </div>
+          <div className="landing-root-header">
+            <Link className={"nav "+(location.pathname =="/joinroom"? "active":"")} to="/joinroom" >Create </Link>
+            <Link className={"nav "+(location.pathname =="/createroom"? "active":"")} to="/createroom">Join</Link>
+          </div>
       
+  
 
-
-       
-
-              <Switch>
+            <div className="landing-content">
+              
+            <Switch >
 
                 <Route path='/joinroom' component={()=> <JoinRoom history={props.history} {...props}  />}></Route>
                 <Route path='/createroom' component={()=> <CreateRoom  {...props} history={props.history}  {...props} />}></Route>
-                <Route exact path='/' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
-                <Route path='*' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
+                <Route path='*' component={()=> <JoinRoom history={props.history} {...props}  />}></Route>
+                {/*<Route exact path='/' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>
+                <Route path='*' component={()=> <LandingPrompt {...props} history={props.history} />}></Route>*/}
             </Switch>
+            </div>
 
 
 

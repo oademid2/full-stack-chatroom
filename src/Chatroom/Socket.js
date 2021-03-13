@@ -1,5 +1,5 @@
 
-import { UserService } from '../FirebaseUtil/UserService';
+import UserService  from '../Services/UserService.js';
 
 export default class SocketManager{
 

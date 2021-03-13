@@ -1,5 +1,5 @@
 .chat-message-view{
-    margin:20px 0px;
+    margin:15px 0px;
     padding: 0px 20px;
     min-width: 100%;
     max-width: 100%;
@@ -9,12 +9,13 @@
 
 
 .chat-message-text-view{
-    width: 85%;
+    width: 90%;
     background-color: rgb(246, 246, 246);
-    padding: 10px;
+    padding: 8px 8px;
     border-radius: 10px;
     display: inline-block;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
+    font-size: 12px;
 }
 
 .user .chat-message-text-view{
@@ -32,7 +33,7 @@
     padding: 0px 0px 0px 0px;
     font-weight: bold;
     margin:0px;
-    font-size:14px;
+    font-size:11px;
     display: inline-block;
     width: auto;
 }

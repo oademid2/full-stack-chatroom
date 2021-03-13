@@ -3,8 +3,8 @@ import { Modal, Button, message } from 'antd';
 import { withRouter} from 'react-router-dom';
 
 //custom imports
-import {FirebaseUtil} from '../FirebaseUtil/FirebaseUtil';
-import {UserService} from '../FirebaseUtil/UserService';
+import {FirebaseUtil} from '../Services/FirebaseUtil';
+import UserService from '../Services/UserService.js';
 
 
 import styleSheet from '../Styles/StyleSheet'
@@ -22,8 +22,23 @@ function JoinRoom(props) {
 
     const [roomCode, setRoomCode] = useState("")
     const [userName, setUserName] = useState("")
+    //const [UserService, setUserService] = useState(props.UserService)
     const [preRoomModalVisible, setPreRoomModalVisible] = useState(false);
 
+       
+    useEffect(() => {
+      if(props.location.state){
+        console.log(props.location.state)
+        if(props.location.state.room){
+          console.log(props.location.state.room)
+          setRoomCode(props.location.state.room.roomCode)
+        }
+      }
+      //register user
+
+
+  }, []);
+  
 
     function setValue(setter, event){
         setter(event.target.value)
@@ -34,6 +49,7 @@ function JoinRoom(props) {
       setPreRoomModalVisible(true);
     };
 
+    
 
 
     async function onJoinRoom(){
@@ -95,7 +111,7 @@ function JoinRoom(props) {
     }
 
   return (
-    <div >
+    <div class="join-room-root">
 
 
       <div class="join-room-view">

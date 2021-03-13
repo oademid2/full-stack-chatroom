@@ -11,10 +11,10 @@ import ChatMessage from './ChatMessage';
 import SocketManager from './Socket'
 import Message from '../Models/MessageModel'
 
-import { FaTelegramPlane } from "react-icons/fa";
+import { FaTelegramPlane, FaWizardsOfTheCoast } from "react-icons/fa";
 import { Modal, Button } from 'antd';
-import { UserService } from '../FirebaseUtil/UserService';
-import { FirebaseUtil } from '../FirebaseUtil/FirebaseUtil';
+import  UserService  from '../Services/UserService.js';
+import { FirebaseUtil } from '../Services/FirebaseUtil';
 import User from '../Models/UserModel';
 
 
@@ -81,6 +81,15 @@ class Chat extends React.Component{
         if(this.props.location.state) room = this.props.location.state.room
         else room = await FirebaseUtil.findRoomById(queryParams.room)
 
+        if(!UserService.userName()){
+            this.props.history.push({
+                pathname: '/joinroom',
+                search: "",
+                state: { room: room}
+            })
+
+            return
+        }
         //if room not found then render a ror page
         if(!room){
             this.setState({status: "404"})
@@ -89,10 +98,11 @@ class Chat extends React.Component{
         }
 
         this.room = room;
+        console.log(UserService.userName())
         //set state
         this.setState({
             room: room,
-            user: {userName:"anon", userID: UserService.token() },
+            user: {userName: UserService.userName(), userID: UserService.token() },
             isAdmin: room.adminID == UserService.token(),
             newMessage: "",
             messages: [],
@@ -150,13 +160,6 @@ class Chat extends React.Component{
             }
             console.log("connected.")
 
-            this.socket.on('generated-user-token', (tkn) => {
-                this.props.data.persistentToken = tkn;
-                localStorage.setItem("persistentToken", tkn)
-                console.log("new token generated: ",tkn)
-            });
-
-
             this.socket.on('backlog-messages', (messages_) => {
                 this.set("messages",messages_ )
                 this.set("status", "200")
@@ -192,18 +195,6 @@ class Chat extends React.Component{
                 console.log("messages updated: ", messages_)
             });
 
-            this.socket.on('find-and-ban-user', (token) => {
-                console.log("user has been banned.")
-                console.log(token === this.props.data.persistentToken)
-                console.log(token, this.props.data.persistentToken)
-
-                
-                if(token === this.props.data.persistentToken){
-                    this.detachFromRoom();
-                    this.set("status","banned" )
-
-                }
-            });
 
         });
 
@@ -226,7 +217,6 @@ class Chat extends React.Component{
 
     sendMessage(){
         let msg = new Message(this.state.room.roomCode, this.state.newMessage, this.state.user.userName, UserService.token())
-        //this.socket.emit("broadcast-message", this.state.room.roomCode, this.state.newMessage, this.state.user.userName, this.props.data.persistentToken)
         this.socket.emit("broadcast-message", this.state.room.roomCode, msg)
         this.set("newMessage", "")
     }
@@ -299,14 +289,14 @@ class Chat extends React.Component{
 
         return (
             
-            <div class="page-root chatroom-root">
+            <div class="chatroom-root">
                 {!this.state.render? <div>Loading</div>:null}
                 {(this.state.render && this.state.status=="404")? <div>STATUS 404</div>:null}
                 {(this.state.render && this.state.status=="exit")? <div>room ended by admin.</div>:null}
                 {(this.state.render && this.state.status=="303")? <div>you've been removed from this room.</div>:null}
 
                 {(this.state.render && this.state.status =="200" )?
-                    <div> {this.state.room && this.state.status != "closed" ?
+        
                         <div class="chatroom-view">
                         
                         <div class="title-view">
@@ -321,9 +311,14 @@ class Chat extends React.Component{
                                 <span onClick={this.leaveRoom.bind(this)} class="leave-text">leave</span>
                         }
 
-                
+                       
+                        <div className="subtitle-view">
+                            <p className="subtitle-text">code: {this.state.room.roomCode}</p>
                         </div>
                     
+                
+                        </div>
+                  
                         <div class="chatroom-messages-view">
                     
                             {this.state.messages?
@@ -348,8 +343,7 @@ class Chat extends React.Component{
                 
                             </div>
                          
-
-                            <div class="typed-message-view">
+                        <div class="typed-message-view">
                             <textarea
                                 class="typed-message-input"
                                 ref={c => (this.textarea = c)}
@@ -367,53 +361,28 @@ class Chat extends React.Component{
                                 <span className="character-count">{this.state.newMessage.length}/{this.MaxMessageLength}</span>
                             </div>
                 
+                        <Modal  width="80%" visible={this.state.modalVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
+                            <div className="message-info-modal">
+                                {this.state.modal.state == "end-room"?
+                                    <div>
+                                        Are you sure you want to end room? All members will be kicked out.
+                                        <button onClick={this.endRoom.bind(this)}> End Room</button>
+
+                                    </div>:null
+                                }
+
+                                {this.state.modal.state == "ban-user"?
+                                    <div>
+                                    <button onClick={()=>this.removeMessage(this.state.modal.data)}> Remove User</button>
+                                    </div>:null
+                                }
+                            </div>
+                        
+                        </Modal>
+
+           
                         </div>
-                        :null
-                    }
-
-                    {this.state.status === "closed"?
-                    <div>
-                        <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
-                        <p> room is closed.</p>
-                    </div>:
-                        null
-                    }
-
-                    {this.state.status === "banned"?
-                    <div>
-                        <p class="title-leave-btn"  onClick={this.exitClosedRoom.bind(this)}>leave</p>
-                        <p> you've been removed.</p>
-                    </div>:
-                        null
-                    }
-
-
-                    <Modal  width="80%" visible={this.state.modalVisible}  onCancel={this.closeMessageOptions.bind(this)} footer={null}>
-                    <div className="message-info-modal">
-                        {this.state.modal.state == "end-room"?
-                            <div>
-                                Are you sure you want to end room? All members will be kicked out.
-                                <button onClick={this.endRoom.bind(this)}> End Room</button>
-
-                            </div>:null
-                        }
-
-                        {this.state.modal.state == "ban-user"?
-                            <div>
-                            <button onClick={()=>this.removeMessage(this.state.modal.data)}> Remove User</button>
-                            </div>:null
-                        }
-                    </div>
-                        
-                        
-                        
-                    </Modal>
-
-
-
-
-
-                    </div>
+                      
 
                     :null
                 }
