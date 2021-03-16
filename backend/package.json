@@ -1,0 +1,23 @@
+{
+  "name": "close-by-server",
+  "version": "1.0.0",
+  "description": "server for close-by react native app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "rimraf": "./node_modules/rimraf/bin.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "http": "0.0.1-security",
+    "react-tiger-transition": "^4.1.2",
+    "socket.io": "1.7.4",
+    "socket.io-client": "1.7.4",
+    "ws": "^7.4.3"
+  }
+}
