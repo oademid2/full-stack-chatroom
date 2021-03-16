@@ -55,7 +55,6 @@ function CreateRoom(props) {
       //create user profile
       let userID  = await FirebaseUtil.getUserToken();
       let user = {userName: userName, userID: userID}
-      console.log(UserService)
 
       UserService.login(user)
       props.data.user = user

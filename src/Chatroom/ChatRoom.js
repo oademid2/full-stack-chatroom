@@ -299,25 +299,7 @@ class Chat extends React.Component{
         
                         <div class="chatroom-view">
                         
-                        <div class="title-view">
-            
-                            <span class="title-text">{this.state.room.roomName}</span>
-                            {/*this.state.isAdmin?
-                                <p class="title-leave-btn"  onClick={this.endRoom.bind(this)}>end room</p>:
-                                <p class="title-leave-btn"  onClick={this.leaveRoom.bind(this)}>leave</p>
-                            */ }
-                        {this.state.isAdmin?
-                                <span onClick={()=>this.showModal("end-room")}class="leave-text">end</span>:
-                                <span onClick={this.leaveRoom.bind(this)} class="leave-text">leave</span>
-                        }
-
-                       
-                        <div className="subtitle-view">
-                            <p className="subtitle-text">code: {this.state.room.roomCode}</p>
-                        </div>
-                    
-                
-                        </div>
+                      7.
                   
                         <div class="chatroom-messages-view">
                     

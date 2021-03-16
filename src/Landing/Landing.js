@@ -27,14 +27,14 @@ function Landing(props) {
 
 
           <div className="landing-root-header">
-            <Link className={"nav "+(location.pathname =="/joinroom"? "active":"")} to="/joinroom" >Create </Link>
-            <Link className={"nav "+(location.pathname =="/createroom"? "active":"")} to="/createroom">Join</Link>
+            <Link className={"nav "+(location.pathname =="/joinroom"? "active":"")} to="/joinroom" >Join </Link>
+            <Link className={"nav "+(location.pathname =="/createroom"? "active":"")} to="/createroom">Create</Link>
           </div>
       
   
 
             <div className="landing-content">
-              
+
             <Switch >
 
                 <Route path='/joinroom' component={()=> <JoinRoom history={props.history} {...props}  />}></Route>

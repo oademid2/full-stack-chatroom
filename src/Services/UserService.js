@@ -15,7 +15,6 @@ class UserService  {
     }
 
     static getUserID(){
-        console.log(localStorage.getItem("userID"))
         return this.user.userID
         //return localStorage.getItem("userID")
     }

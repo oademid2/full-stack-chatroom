@@ -1,5 +1,5 @@
 import './App.css';
-import { useHistory, BrowserRouter as Route, Switch} from 'react-router-dom';
+import {  useHistory, BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 
 import ChatRoom from './Chatroom/ChatRoom'
 import Landing from './Landing/Landing'
@@ -24,6 +24,7 @@ function App(props) {
       <div className="app-body">
         
         <Switch>
+           <Route  path='/cool' component={()=><div>cool</div> }></Route>
           <Route  path='/chat' component={()=><ChatRoom  data={data}   history={history}  /> }></Route>
           <Route  path='/' component={()=><Landing   data={data}  history={history}  />} ></Route>
       </Switch>
