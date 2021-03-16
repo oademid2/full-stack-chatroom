@@ -4,7 +4,7 @@
 
 
 
-##Libraries & Frameworks
+## Libraries & Frameworks
 - Express + React + Node.js stack
 - Firebase chatroom & user storage
 - Socket.io for front-end and server socket managment
